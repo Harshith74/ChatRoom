@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
         
     strcpy(req.group_name,argv[4]);
     strcpy(req.user_name,argv[3]);
-
+	
 	mode=PROD;
 
 	

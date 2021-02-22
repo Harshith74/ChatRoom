@@ -11,7 +11,6 @@ enum MSG_STATUS{CLOSE_ME,MESSAGE};
 
 enum Mode{DEV,PROD};
 
-//--------------------------------- Group Chat Request ------------------------------------------//
 
 struct group_chat_request
 {
@@ -20,15 +19,12 @@ struct group_chat_request
 };
 
 
-//--------------------------------- Group Chat Acknowledge---------------------------------------//
-
 struct group_chat_acknowledge
 {
     int group_identifier;
     int user_identifier;    
 };
 
-//--------------------------------- Group Message -----------------------------------------------//
 struct group_message
 {
     enum MSG_STATUS status;
@@ -36,41 +32,15 @@ struct group_message
     int user_identifier;
     char message[msg_size];
     char user_name[uname_size];
-    struct timeval time_stamp;
-    int msgid;//issued by server
+    long long time_stamp;
 };
-//----------------------------------Message Queue-----------------------------------------------//
+
 struct message_queue
 {
     struct group_message message_q_ll;
     struct message_queue *next;
 };
 
-struct timeval GetTimeStamp() {
-    /*
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv;
-    */
-   struct timeval timestamp;
-    gettimeofday(&timestamp, NULL);
-    long seconds = timestamp.tv_sec;
-    long microseconds = timestamp.tv_usec;
-    //seconds += secondOffset;
-    //microseconds += usecondOffset;
-    while(microseconds < 0) {
-        seconds--;
-        microseconds += 1000 * 1000;
-    }
-    while(microseconds >= 1000 * 1000) {
-        seconds++;
-        microseconds -= 1000 * 1000;
-    }
-    timestamp.tv_sec = seconds;
-    timestamp.tv_usec = microseconds;
-    return timestamp;
-
-}
 
 
 #endif

@@ -17,7 +17,7 @@ Documentation
 
 
 
-#define PORT 8083 
+#define PORT 8088
 
 #define MAX_GROUPS 3
 #define MAX_USER_PERGROUP 100
@@ -94,8 +94,9 @@ int group_init_count	=0;
 
 void handle_sig()
 {
-	printf("Do you want to close the server program?(Y/n):");
-	char close_in[10]="y";
+	char close_in;
+	printf("Do you want to close the server program?(Y/n): ");
+	scanf("%c",&close_in);
 	if(Message_Q==NULL)
 		printf("Server is empty");
 	else
@@ -106,7 +107,7 @@ void handle_sig()
 		}
 	}
 	
-	if(close_in[0]=='y'||close_in[0]=='Y')
+	if(close_in =='y'||close_in =='Y')
 	{
 		for(int i=0;i<3;i++)
 			pthread_kill(send_pthread[i],SIGKILL);
@@ -166,7 +167,6 @@ void* recv_message(void *nsock)
 	while(read(new_socket ,&new_message,sizeof(new_message)))
 	{
 			pthread_mutex_lock(&message_locking);
-			new_message.msgid=msg_id_counter++;
 			push_to_queue(new_message);
 			pthread_mutex_unlock(&message_locking);
 			pthread_cond_signal(&QEMPTYWAIT);
@@ -187,7 +187,7 @@ void* send_message(void *nsock)
 		pthread_mutex_lock(&message_locking);	
 		while(is_queue_empty(Message_Q))
 		{
-			//printf("Waiting...\n");
+			printf("Waiting...\n");
 			pthread_cond_wait(&QEMPTYWAIT,&message_locking);
 		
 		}
@@ -242,7 +242,7 @@ int main(int argc, char const *argv[])
 		}
 	printf("executing...\n");
 	for(int i=0;i<MAX_GROUPS;i++)
-    pthread_create(&send_pthread[i], NULL, &send_message, NULL); 
+   		 pthread_create(&send_pthread[i], NULL, &send_message, NULL); 
 	if (listen(server_fd, 10) < 0) 
 	{ 
 		perror("listen"); 
@@ -255,13 +255,12 @@ int main(int argc, char const *argv[])
 		int *new_socket=malloc(sizeof(int));
 		*new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen); 
 	
-		if(pthread_create(&recv_pthread[client_count++],NULL,
-                           recv_message, (void *)new_socket) < 0)
-						   {
-							    perror("pthread_create()");
-            					exit(0);
-						   }
-	
+		if(pthread_create(&recv_pthread[client_count++],NULL,recv_message, (void *)new_socket) < 0)
+		{
+			perror("pthread_create()");
+			exit(0);
+		}
+
 	}
 
 	pthread_exit(NULL);
